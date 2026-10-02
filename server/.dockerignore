@@ -1,0 +1,32 @@
+# Secrets - never bake into an image
+.env
+.env.*
+*.pem
+*.key
+
+# Dependencies (installed inside the image with npm ci)
+node_modules
+npm-debug.log*
+yarn-error.log*
+
+# VCS / tooling
+.git
+.gitignore
+.vscode
+.idea
+
+# Build / test output and logs
+coverage
+logs
+*.log
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+.dockerignore
+
+# Local runtime data - uploaded files must not be shipped inside the image
+uploads/evidence/*
+uploads/complaints/*
+uploads/documents/*

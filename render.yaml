@@ -1,0 +1,103 @@
+# Render Blueprint for Smart Police Station.
+#
+# Contains NO secret values. Every variable marked `sync: false` is prompted for
+# in the Render dashboard when you create the Blueprint (and is never stored in Git).
+#
+# Two ways to use this file:
+#   A) Dashboard > New > Blueprint > pick this repo  (uses this file), or
+#   B) Ignore this file and create the services by hand (see DEPLOYMENT.md).
+#
+# Cost note: `plan: free` web services sleep after ~15 minutes idle and have an
+# ephemeral filesystem. Fine for a first deploy / demo; use `starter` (or higher)
+# for a real SOS / emergency workload.
+
+services:
+  # ---------------------------------------------------------------- Backend API
+  - type: web
+    name: smart-police-api
+    runtime: docker
+    # dockerfilePath / dockerContext are relative to the REPO ROOT in a Blueprint,
+    # so rootDir is intentionally not set here.
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # PORT is injected by Render automatically - do not set it.
+      - key: MONGODB_URI          # MongoDB Atlas connection string
+        sync: false
+      - key: REDIS_URL            # Redis Cloud URL
+        sync: false
+      - key: RABBITMQ_URL         # CloudAMQP URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: JWT_ACCESS_EXPIRES_IN
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 7d
+      - key: CLIENT_URL           # e.g. https://smart-police-web.onrender.com
+        sync: false
+      - key: API_BASE_URL         # e.g. https://smart-police-api.onrender.com  (no /api)
+        sync: false
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+
+  # ------------------------------------------------------------ Frontend (Vite)
+  - type: web
+    name: smart-police-web
+    runtime: static
+    rootDir: client
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: VITE_API_URL         # e.g. https://smart-police-api.onrender.com/api  (build-time)
+        sync: false
+      - key: VITE_GOOGLE_MAPS_API_KEY   # public, referrer-restricted browser key
+        sync: false
+    routes:
+      # Single-page app: serve index.html for every client-side route (React Router).
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # ------------------------------------------------------ Background worker (optional)
+  # Consumes RabbitMQ jobs: SOS SMS alerts (Twilio), queued notifications, audit logs.
+  # Render background workers have no free tier, so this is commented out.
+  # Uncomment it if you use RabbitMQ in production (see DEPLOYMENT.md, "Worker").
+  #
+  # - type: worker
+  #   name: smart-police-worker
+  #   runtime: docker
+  #   dockerfilePath: ./server/Dockerfile
+  #   dockerContext: ./server
+  #   dockerCommand: node src/worker.js
+  #   plan: starter
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production
+  #     - key: MONGODB_URI
+  #       sync: false
+  #     - key: RABBITMQ_URL
+  #       sync: false
+  #     - key: TWILIO_ACCOUNT_SID
+  #       sync: false
+  #     - key: TWILIO_AUTH_TOKEN
+  #       sync: false
+  #     - key: TWILIO_PHONE_NUMBER
+  #       sync: false

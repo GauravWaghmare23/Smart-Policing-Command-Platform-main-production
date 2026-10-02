@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #F8FAFC;
+    color: #0F172A;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-100;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-300 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-surface-400;
+  }
+}
+
+@layer components {
+  /* =============================================
+     CARD SYSTEM
+     ============================================= */
+  .card {
+    @apply bg-white rounded-2xl shadow-card border border-surface-200;
+  }
+  .card-hover {
+    @apply card transition-all duration-200 hover:shadow-card-md hover:border-primary-200 cursor-pointer;
+  }
+
+  /* =============================================
+     BUTTON SYSTEM
+     ============================================= */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold text-sm
+           rounded-xl px-4 py-2.5 transition-all duration-200 focus:outline-none
+           focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 
+           focus:ring-primary-500 shadow-blue active:bg-primary-800;
+  }
+  .btn-secondary {
+    @apply btn bg-surface-100 text-surface-700 border border-surface-200 
+           hover:bg-surface-200 focus:ring-surface-400;
+  }
+  .btn-danger {
+    @apply btn bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
+  }
+  .btn-ghost {
+    @apply btn text-surface-600 hover:bg-surface-100 hover:text-surface-900 focus:ring-surface-400;
+  }
+  .btn-sm {
+    @apply text-xs px-3 py-1.5 rounded-lg;
+  }
+  .btn-icon {
+    @apply w-9 h-9 p-0 rounded-xl;
+  }
+
+  /* =============================================
+     INPUT SYSTEM
+     ============================================= */
+  .input {
+    @apply w-full rounded-xl border border-surface-200 bg-white px-3.5 py-2.5
+           text-sm text-surface-900 placeholder-surface-400
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-400
+           transition duration-150;
+  }
+  .input-label {
+    @apply block text-sm font-semibold text-surface-700 mb-1.5;
+  }
+  .select {
+    @apply input appearance-none;
+  }
+
+  /* =============================================
+     TABLE SYSTEM
+     ============================================= */
+  .table-container {
+    @apply card overflow-hidden;
+  }
+  .table {
+    @apply w-full text-left text-sm;
+  }
+  .table-head {
+    @apply bg-surface-50 text-surface-500 text-xs font-semibold uppercase tracking-wider border-b border-surface-200;
+  }
+  .table-head th {
+    @apply px-4 py-3;
+  }
+  .table-body tr {
+    @apply border-b border-surface-100 last:border-0 hover:bg-primary-50/50 transition-colors duration-150;
+  }
+  .table-body td {
+    @apply px-4 py-3 text-surface-700;
+  }
+
+  /* =============================================
+     BADGE/STATUS
+     ============================================= */
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+  .badge-blue   { @apply badge bg-primary-50 text-primary-700; }
+  .badge-green  { @apply badge bg-success-50 text-success-700; }
+  .badge-red    { @apply badge bg-danger-50 text-danger-700; }
+  .badge-amber  { @apply badge bg-warning-50 text-warning-700; }
+  .badge-gray   { @apply badge bg-surface-100 text-surface-600; }
+
+  /* =============================================
+     NAV LINK (sidebar)
+     ============================================= */
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+           text-surface-600 transition-all duration-150
+           hover:text-surface-900 hover:bg-surface-100;
+  }
+  .nav-link.active {
+    @apply bg-primary-600 text-white shadow-blue font-semibold;
+  }
+
+  /* =============================================
+     PAGE HEADER
+     ============================================= */
+  .page-header {
+    @apply flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6;
+  }
+  .page-title {
+    @apply text-2xl font-bold text-surface-900;
+  }
+  .page-subtitle {
+    @apply text-sm text-surface-500 mt-0.5;
+  }
+
+  /* =============================================
+     SECTION DIVIDER
+     ============================================= */
+  .section-title {
+    @apply text-xs font-semibold text-surface-400 uppercase tracking-widest;
+  }
+
+  /* =============================================
+     MODAL OVERLAY
+     ============================================= */
+  .modal-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center p-4 
+           bg-surface-900/50 backdrop-blur-sm animate-fade-in;
+  }
+  .modal-panel {
+    @apply bg-white rounded-3xl shadow-modal w-full animate-slide-up p-7;
+  }
+  .modal-header {
+    @apply flex items-center justify-between pb-5 mb-5 border-b border-surface-100;
+  }
+  .modal-title {
+    @apply text-lg font-bold text-surface-900;
+  }
+  .modal-footer {
+    @apply flex items-center justify-end gap-3 pt-5 mt-5 border-t border-surface-100;
+  }
+
+  /* =============================================
+     SOS PULSE (emergency)
+     ============================================= */
+  @keyframes pulse-ring {
+    0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220,38,38,0.7); }
+    70%  { transform: scale(1);    box-shadow: 0 0 0 10px rgba(220,38,38,0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+  }
+  .sos-pulse {
+    animation: pulse-ring 2s infinite;
+  }
+
+  /* =============================================
+     SKELETON LOADER
+     ============================================= */
+  .skeleton {
+    @apply animate-pulse bg-surface-200 rounded-lg;
+  }
+
+  /* =============================================
+     GRADIENT ACCENT LINE
+     ============================================= */
+  .accent-bar {
+    @apply h-0.5 w-12 rounded-full bg-gradient-to-r from-primary-500 to-primary-300;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+}

@@ -1,0 +1,92 @@
+# LOCAL DEVELOPMENT ONLY - not used by Render.
+#
+# Runs: backend + Redis + RabbitMQ (with management UI).
+# MongoDB is NOT included: point MONGODB_URI (in server/.env) at your MongoDB Atlas
+# cluster (or any MongoDB you run yourself).
+#
+#   cp server/.env.example server/.env     # then fill in real values (git-ignored)
+#   docker compose up --build
+#
+# Containers talk to each other by service name (redis, rabbitmq) - never localhost.
+# No secrets live in this file; they come from server/.env.
+
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: smart-police-backend
+    ports:
+      - "4000:4000"
+    env_file:
+      - path: ./server/.env
+        required: false
+    environment:
+      NODE_ENV: development
+      PORT: "4000"
+      # Container-to-container addresses (override whatever server/.env contains)
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads
+    restart: unless-stopped
+
+  # Optional: consumes RabbitMQ jobs (SOS SMS alerts, etc.).
+  # Start with:  docker compose --profile worker up --build
+  worker:
+    profiles: ["worker"]
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: smart-police-worker
+    command: ["node", "src/worker.js"]
+    env_file:
+      - path: ./server/.env
+        required: false
+    environment:
+      NODE_ENV: development
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: smart-police-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - redis_data:/data
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: smart-police-rabbitmq
+    ports:
+      - "5672:5672"     # AMQP
+      - "15672:15672"   # Management UI -> http://localhost:15672
+    # Local-only default credentials of the official image (guest/guest).
+    # Change via RABBITMQ_DEFAULT_USER / RABBITMQ_DEFAULT_PASS if you expose this beyond your machine.
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  uploads_data:
+  redis_data:
+  rabbitmq_data:

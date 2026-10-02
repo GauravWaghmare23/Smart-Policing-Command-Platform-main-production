@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+!.env.example
+coverage/
+logs/
+*.log
+uploads/evidence/*
+!uploads/evidence/.gitkeep
+uploads/complaints/*
+!uploads/complaints/.gitkeep
+uploads/documents/*
+!uploads/documents/.gitkeep
